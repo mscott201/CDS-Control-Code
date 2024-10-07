@@ -38,7 +38,7 @@ class Laser:
         for i in range(len(VALUE)):
             TX[i] = VALUE[i]
 
-        assert int(self.DEV.write(0x1,TX, 100)) == len(TX)
+        self.DEV.write(0x1,TX, 100)
 
         RX = bytearray(65)
         RX = self.DEV.read(0x81, 64, 100)
@@ -104,10 +104,10 @@ class Laser:
         curr = -1
 
         if (self.HardInfo & (1 << self.DA2_048V_DA3V)):
-            curr = 10.0**((float(value[0]) * 256.0 + float(value[1]) * 2.5 / 1023.0 - 0.5) / 0.2);
+            curr = 10**(((float(value[0]) * 256.0 + float(value[1]) * 2.5) / 1023.0) - 0.5) / 0.2;
 
         else:
-            curr = 10.0**((float(value[0]) * 256.0 + float(value[1]) * 3.0 / 1023.0 - 0.5) / 0.2);
+            curr = 10**(((float(value[0]) * 256.0 + float(value[1]) * 3.0) / 1023.0) - 0.5) / 0.2;
 
         return curr
 
@@ -315,7 +315,7 @@ class Laser:
 
         return longshort
 
-    def GetPulseWidth(self)
+    def GetPulseWidth(self):
 
         indat = bytearray(1)
         indat[0]=9
@@ -330,6 +330,8 @@ class Laser:
 
         if value > 100:
             value = int(value / 10.0)
+
+        value = int(value)
 
         indat = bytearray(4)
         indat[0]=8
@@ -363,12 +365,14 @@ class Laser:
  
     def SetPG1Rate(self, freq):
 
+        freq = int(freq*1000)
+
         indat = bytearray(5)
         indat[0] = 15
-        indat[1] = ((freq >> 24) & 255)
-        indat[2] = ((freq >> 16) & 255)
-        indat[3] = ((freq >> 8) & 255)
-        indat[4] = (freq & 255)
+        indat[1] = ((int(freq) >> 24) & 255)
+        indat[2] = ((int(freq) >> 16) & 255)
+        indat[3] = ((int(freq) >> 8) & 255)
+        indat[4] = (int(freq) & 255)
     
         values = self.LASER_COMMAND(indat)
 
@@ -392,12 +396,14 @@ class Laser:
 
     def SetPG2Rate(self, freq):
 
+        freq = int(freq*1000)
+        print("PG2 Freq = ", freq)
         indat = bytearray(5)
         indat[0] = 16
-        indat[1] = ((freq >> 24) & 255)
-        indat[2] = ((freq >> 16) & 255)
-        indat[3] = ((freq >> 8) & 255)
-        indat[4] = (freq & 255)
+        indat[1] = ((int(freq) >> 24) & 255)
+        indat[2] = ((int(freq) >> 16) & 255)
+        indat[3] = ((int(freq) >> 8) & 255)
+        indat[4] = (int(freq) & 255)
     
         values = self.LASER_COMMAND(indat)
 

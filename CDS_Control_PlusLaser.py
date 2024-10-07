@@ -1,6 +1,7 @@
 #IMPORTS######################################################################
 import threading
 from CDS_Motor_PlusStrain import Motor
+from CDS_Laser import Laser
 from tkinter import *
 from tkinter import ttk
 from tkinter import filedialog
@@ -305,21 +306,27 @@ class CDS_Control():
         self.ldcurrentLabel = ttk.Label(self.mainframe, text="LD Current (mA)")
         self.ldcurrentLabel.grid(column=11, row=2, sticky=E)
         self.btnldcurrent = ttk.Button(self.mainframe, text="Set LD Current",command=self.setLDCurrent)
-        self.btnldcurrent.grid(row=3,column=11,columnspan=2, sticky=(N, W, E, S))
+        self.btnldcurrent.grid(row=3,column=11,columnspan=1, sticky=(N, W, E, S))
+        self.ldcurrentIn = StringVar(value = '0')
+        ttk.Entry(self.mainframe, textvariable=self.ldcurrentIn, width=15).grid(column=12, row=3, sticky=(W))
 
         self.trigrate = StringVar(value = '0')
         ttk.Entry(self.mainframe, textvariable=self.trigrate, width=15).grid(column=12, row=5, sticky=(W))
         self.trigRateLabel = ttk.Label(self.mainframe, text="Trigger Rate (kHz)")
         self.trigRateLabel.grid(column=11, row=5, sticky=E)
         self.btntrigrate = ttk.Button(self.mainframe, text="Set Trig Rate",command=self.setTriggerRate)
-        self.btntrigrate.grid(row=6,column=11,columnspan=2, sticky=(N, W, E, S))
+        self.btntrigrate.grid(row=6,column=11,columnspan=1, sticky=(N, W, E, S))
+        self.trigrateIn = StringVar(value = '0')
+        ttk.Entry(self.mainframe, textvariable=self.trigrateIn, width=15).grid(column=12, row=6, sticky=(W))
 
         self.pulsewidth = StringVar(value = '0')
         ttk.Entry(self.mainframe, textvariable=self.pulsewidth, width=15).grid(column=12, row=8, sticky=(W))
         self.pulseWidthLabel = ttk.Label(self.mainframe, text="Pulse Width (ps)")
         self.pulseWidthLabel.grid(column=11, row=8, sticky=E)
         self.btnpulsewidth = ttk.Button(self.mainframe, text="Set Pulse Width",command=self.setPulseWidth)
-        self.btnpulsewidth.grid(row=9,column=11,columnspan=2, sticky=(N, W, E, S))
+        self.btnpulsewidth.grid(row=9,column=11,columnspan=1, sticky=(N, W, E, S))
+        self.pulsewidthIn = StringVar(value = '0')
+        ttk.Entry(self.mainframe, textvariable=self.pulsewidthIn, width=15).grid(column=12, row=9, sticky=(W))
 
         self.laserPDCurrent = StringVar(value = '0')
         ttk.Entry(self.mainframe, textvariable=self.laserPDCurrent, width=15).grid(column=12, row=11, sticky=(W))
@@ -560,8 +567,8 @@ class CDS_Control():
 
         if(self.laser != -1):
             self.laserPDCurrent.set(str(self.laser.GetPDCurrent()))
-            self.pulsewidth.set(str(self.laser.GetPulseWidth()))
-            self.trigrate.set(str(self.laser.GetTrigRate()))
+            self.pulsewidth.set(str(self.laser.GetPulseWidth()*10))
+            self.trigrate.set(str(self.getTriggerRate()))
             self.ldcurrent.set(str(self.laser.GetLDCurrent()))
 
         self.root.after(500, app.UpdatePos)
@@ -1020,7 +1027,8 @@ class CDS_Control():
     def connectToLaser(self):
         dev = usb.core.find(idVendor=0x04d8, idProduct=0xfa73)
         if dev is None:
-                raise ValueError('Device not found')
+            print("Did not find laser device")
+            raise ValueError('Device not found')
         
         for cfg in dev:
             for intf in cfg:
@@ -1036,13 +1044,13 @@ class CDS_Control():
         return 0
 
     def setLDCurrent(self):
-        current = float(self.ldcurrent.get())
+        current = float(self.ldcurrentIn.get())
         self.laser.SetLDCurrent(current)
         return 0
 
     def setPulseWidth(self):
-        pulse = float(self.pulsewidth.get())
-        self.laser.SetPulseWidth(pulse)
+        pulse = float(self.pulsewidthIn.get())
+        self.laser.SetPulseWidth(pulse/10.0)
         return 0
 
     def setLDStatus(self):
@@ -1090,7 +1098,7 @@ class CDS_Control():
         return 0
 
     def setTriggerRate(self):
-        rate = float(self.trigrate.get())
+        rate = float(self.trigrateIn.get())
         if self.style.lookup("EXT.TButton", "background") == 'blue':
             print("Set to use external trigger, doing nothing")
             return 1
@@ -1112,9 +1120,9 @@ class CDS_Control():
 
     def getTriggerRate(self):
         if self.trig == 1:
-            return self.laser.GetPG1Rate()
+            return float(self.laser.GetPG1Rate()/1000.0)
         elif self.trig == 2:
-            return self.laser.GetPG2Rate()
+            return float(self.laser.GetPG2Rate()/1000.0)
         elif self.trig == -1:
             return "No trigger"
         else:
