@@ -69,7 +69,6 @@ class Laser:
         self.HardInfo = value[0]
 
         print("Got hardware")
-        print(self.HardInfo)
 
         return
 
@@ -86,6 +85,32 @@ class Laser:
         alarms[3] = ((values[2] & 0x80) == 0x80 );
 
         return alarms
+
+    def GetPDCurrent(self):
+
+        if self.HardInfo < 0:
+            print("No Hardware Info")
+            return 1
+
+        indat = bytearray(1)
+        indat[0]=9
+        
+        value = self.LASER_COMMAND(indat);
+
+        num = 1.0
+        if (self.HardInfo & (1 << self.Temp60_40)):
+            num = 1.5
+
+        curr = -1
+
+        if (self.HardInfo & (1 << self.DA2_048V_DA3V)):
+            curr = 10.0**((float(value[0]) * 256.0 + float(value[1]) * 2.5 / 1023.0 - 0.5) / 0.2);
+
+        else:
+            curr = 10.0**((float(value[0]) * 256.0 + float(value[1]) * 3.0 / 1023.0 - 0.5) / 0.2);
+
+        return curr
+
 
     def GetLDTemp(self):
 
@@ -105,9 +130,9 @@ class Laser:
         temp = -1
 
         if (self.HardInfo & (1 << self.DA2_048V_DA3V)):
-            temp = (float(values[0]*256.0 + values[1])/1023.0) * 50.0 * num
+            temp = (float(value[0]*256.0 + value[1])/1023.0) * 50.0 * num
         else:
-            temp = (float(values[0]*256.0 + values[1])/1023.0) * 40.0 * num
+            temp = (float(value[0]*256.0 + value[1])/1023.0) * 40.0 * num
 
         return temp
 
@@ -128,15 +153,14 @@ class Laser:
             num = 0.125
             num2 = 2048
 
-        num3 = float(values[0]*256
-
+        num3 = float(value[0]*256)
 
         temp = -1
 
         if (self.HardInfo & (1 << self.DA2_048V_DA3V)):
-            temp = (float(values[0]*256.0 + values[1])/1023.0) * 50.0 * num
+            temp = (float(value[0]*256.0 + value[1])/1023.0) * 50.0 * num
         else:
-            temp = (float(values[0]*256.0 + values[1])/1023.0) * 40.0 * num
+            temp = (float(value[0]*256.0 + value[1])/1023.0) * 40.0 * num
 
         return temp
 
@@ -151,7 +175,7 @@ class Laser:
         
         value = self.LASER_COMMAND(indat);
 
-        return (((values[15] & 4) == 4))
+        return (((value[15] & 4) == 4))
 
     def SetLDStatus(self, onoff):
 
@@ -178,7 +202,7 @@ class Laser:
         
         value = self.LASER_COMMAND(indat);
 
-        return (((values[15] & 8) == 8))
+        return (((value[15] & 8) == 8))
 
     def SetTECStatus(self, onoff):
 
@@ -291,7 +315,7 @@ class Laser:
 
         return longshort
 
-    def GetPulseWidth(self):
+    def GetPulseWidth(self)
 
         indat = bytearray(1)
         indat[0]=9
@@ -304,20 +328,23 @@ class Laser:
 
     def SetPulseWidth(self, value):
 
+        if value > 100:
+            value = int(value / 10.0)
+
         indat = bytearray(4)
         indat[0]=8
-        indat[1]=1 # Could be 0 or another num
+        indat[1]=0 # Could be 0 or another num
         indat[2]= value >> 8
         indat[3]= value & 0xFF
  
-        values = self.LASER_COMMAND(indat);
+        self.LASER_COMMAND(indat);
 
-        print("Setting pusle width to", value)
+        print("Setting pulse width to", value)
         print("Pulse width = ", self.GetPulseWidth())
 
         return 0
 
-    def SetTriggerOnOff(self, PG1=0, PG2=0, EXT=0)
+    def SetTriggerOnOff(self, PG1=0, PG2=0, EXT=0):
         indat = bytearray(2)
         indat[0] = 14
         number = 0
@@ -334,7 +361,7 @@ class Laser:
         return 0
 
  
-    def SetPG1Rate(self, rate):
+    def SetPG1Rate(self, freq):
 
         indat = bytearray(5)
         indat[0] = 15
@@ -347,7 +374,7 @@ class Laser:
 
         return 0
 
-    def GetPG1Rate(self, rate):
+    def GetPG1Rate(self):
 
         indat = bytearray(5)
         indat[0] = 15
@@ -363,7 +390,7 @@ class Laser:
                                        
         return result;
 
-    def SetPG2Rate(self, rate):
+    def SetPG2Rate(self, freq):
 
         indat = bytearray(5)
         indat[0] = 16
@@ -376,7 +403,7 @@ class Laser:
 
         return 0
 
-    def GetPG2Rate(self, rate):
+    def GetPG2Rate(self):
 
         indat = bytearray(5)
         indat[0] = 16
@@ -397,7 +424,7 @@ class Laser:
 #if dev is None:
 #        raise ValueError('Device not found')
 #
-#print(dev)
+##print(dev)
 #
 #for cfg in dev:
 #    for intf in cfg:
@@ -410,10 +437,32 @@ class Laser:
 #laser = Laser(dev)
 #
 #laser.GetHardwareInfo()
-
-
-
-
-
-
-
+#
+#laser.SetTECStatus(0)
+#
+##laser.SetPG1Rate(1000000)
+#print("PG1 rate =", laser.GetPG1Rate())
+#laser.SetTriggerOnOff(1,0,0)
+#
+#print("Pulse width =", laser.GetPulseWidth())
+#laser.SetPulseWidth(90)
+#
+#print("BD Temp = ", laser.GetBDTemp())
+#print("LD Temp = ", laser.GetLDTemp())
+#print("LD Current = ", laser.GetLDCurrent())
+#
+#print("LD Status = ", laser.GetLDStatus())
+#print("TEC Status = ", laser.GetTECStatus())
+#
+#print("Bias = ", laser.GetBias())
+#
+#laser.SetTriggerOnOff(1,0,0)
+#
+#
+#laser.SetLDCurrent(185.01)
+#print("New LD Current = ", laser.GetLDCurrent())
+#
+#
+#laser.SetLDStatus(0)
+#
+#

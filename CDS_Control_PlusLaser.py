@@ -27,8 +27,10 @@ class CDS_Control():
 
     def __init__(self, root):
 
+        self.move_event = -1
 
         self.laser = -1
+        self.trig = -1
 
         self.current_state = []
 
@@ -86,7 +88,7 @@ class CDS_Control():
         self.btnSerClo2 = ttk.Button(self.mainframe, text="Close Controller 2 Serial Port",command=self.closeSerial2)
         self.btnSerClo2.grid(row=1,column=6,columnspan=2,pady=20, sticky=(N, W, E, S))
 
-        self.mainframe.rowconfigure(2, minsize=30)
+#        self.mainframe.rowconfigure(2, minsize=30)
 
         btnMotor1 = ttk.Button(self.mainframe, text="Initialise Axis 1",command=self.InitialiseAxis1).grid(row=3,column=0,columnspan=2, sticky=(N, W, E, S))
         btnMotor2 = ttk.Button(self.mainframe, text="Initialise Axis 2",command=self.InitialiseAxis2).grid(row=3,column=2,columnspan=2, sticky=(N, W, E, S))
@@ -150,7 +152,7 @@ class CDS_Control():
         ttk.Entry(self.mainframe, textvariable=self.Target4).grid(column=7, row=7, sticky=(W, E))
         ttk.Label(self.mainframe, text="Axis 4 target:").grid(column=6, row=7, sticky=W)
 
-        self.mainframe.rowconfigure(8, minsize=30) 
+#        self.mainframe.rowconfigure(8, minsize=30) 
 
         self.btnStart1 = ttk.Button(self.mainframe, text="Start Controller 1 Program",command=partial(self.start, 1))
         self.btnStart1.grid(row=9,column=0,columnspan=6, sticky=(N, W, E, S))
@@ -161,7 +163,7 @@ class CDS_Control():
         self.btnStpP2 = ttk.Button(self.mainframe, text="Stop Controller 2 Program",command=partial(self.stop, 2))
         self.btnStpP2.grid(row=10,column=6,columnspan=2, sticky=(N, W, E, S))
 
-        self.mainframe.rowconfigure(11, minsize=30) 
+#        self.mainframe.rowconfigure(11, minsize=30) 
 
         btnMove1 = ttk.Button(self.mainframe, text="Axis 1 Move to Position",command=partial(self.singlemove, 1)).grid(row=12,column=0,columnspan=2, sticky=(N, W, E, S))
         btnMove2 = ttk.Button(self.mainframe, text="Axis 2 Move to Position",command=partial(self.singlemove, 2)).grid(row=12,column=2,columnspan=2, sticky=(N, W, E, S))
@@ -224,110 +226,118 @@ class CDS_Control():
         for child in self.mainframe.winfo_children(): 
             child.grid_configure(padx=5, pady=5)
 
-        self.mainframe.columnconfigure(9, minsize=20, weight = 1) 
-        self.mainframe.columnconfigure(12, minsize=20, weight = 0) 
+        #self.mainframe.columnconfigure(9, minsize=20, weight = 1) 
 
         self.Axis1LimitLeft = StringVar()
-        ttk.Entry(self.mainframe, textvariable=self.Axis1LimitLeft).grid(column=11, row=0, sticky=(W))
+        ttk.Entry(self.mainframe, textvariable=self.Axis1LimitLeft, width=15).grid(column=9, row=0, sticky=(W))
         self.Axis1LimitLeftLabel = ttk.Label(self.mainframe, text="Axis 1 Left Limit:")
-        self.Axis1LimitLeftLabel.grid(column=10, row=0, sticky=E)
+        self.Axis1LimitLeftLabel.grid(column=8, row=0, sticky=E)
 
         self.Axis1LimitRight = StringVar()
-        ttk.Entry(self.mainframe, textvariable=self.Axis1LimitRight).grid(column=11, row=1, sticky=(W))
+        ttk.Entry(self.mainframe, textvariable=self.Axis1LimitRight, width=15).grid(column=9, row=1, sticky=(W))
         self.Axis1LimitRightLabel = ttk.Label(self.mainframe, text="Axis 1 Right Limit:")
-        self.Axis1LimitRightLabel.grid(column=10, row=1, sticky=E)
+        self.Axis1LimitRightLabel.grid(column=8, row=1, sticky=E)
 
         self.Axis2LimitLeft = StringVar()
-        ttk.Entry(self.mainframe, textvariable=self.Axis2LimitLeft).grid(column=11, row=2, sticky=(W))
+        ttk.Entry(self.mainframe, textvariable=self.Axis2LimitLeft, width=15).grid(column=9, row=2, sticky=(W))
         self.Axis2LimitLeftLabel = ttk.Label(self.mainframe, text="Axis 2 Left Limit:")
-        self.Axis2LimitLeftLabel.grid(column=10, row=2, sticky=E)
+        self.Axis2LimitLeftLabel.grid(column=8, row=2, sticky=E)
 
         self.Axis2LimitRight = StringVar()
-        ttk.Entry(self.mainframe, textvariable=self.Axis2LimitRight).grid(column=11, row=3, sticky=(W))
+        ttk.Entry(self.mainframe, textvariable=self.Axis2LimitRight, width=15).grid(column=9, row=3, sticky=(W))
         self.Axis2LimitRightLabel = ttk.Label(self.mainframe, text="Axis 2 Right Limit:")
-        self.Axis2LimitRightLabel.grid(column=10, row=3, sticky=E)
+        self.Axis2LimitRightLabel.grid(column=8, row=3, sticky=E)
 
         self.Axis3LimitLeft = StringVar()
-        ttk.Entry(self.mainframe, textvariable=self.Axis3LimitLeft).grid(column=11, row=4, sticky=(W))
+        ttk.Entry(self.mainframe, textvariable=self.Axis3LimitLeft, width=15).grid(column=9, row=4, sticky=(W))
         self.Axis3LimitLeftLabel = ttk.Label(self.mainframe, text="Axis 3 Left Limit:")
-        self.Axis3LimitLeftLabel.grid(column=10, row=4, sticky=E)
+        self.Axis3LimitLeftLabel.grid(column=8, row=4, sticky=E)
 
         self.Axis3LimitRight = StringVar()
-        ttk.Entry(self.mainframe, textvariable=self.Axis3LimitRight).grid(column=11, row=5, sticky=(W))
+        ttk.Entry(self.mainframe, textvariable=self.Axis3LimitRight, width=15).grid(column=9, row=5, sticky=(W))
         self.Axis3LimitRightLabel = ttk.Label(self.mainframe, text="Axis 3 Right Limit:")
-        self.Axis3LimitRightLabel.grid(column=10, row=5, sticky=E)
+        self.Axis3LimitRightLabel.grid(column=8, row=5, sticky=E)
 
         self.Axis4LimitLeft = StringVar()
-        ttk.Entry(self.mainframe, textvariable=self.Axis4LimitLeft).grid(column=11, row=6, sticky=(W))
+        ttk.Entry(self.mainframe, textvariable=self.Axis4LimitLeft, width=15).grid(column=9, row=6, sticky=(W))
         self.Axis4LimitLeftLabel = ttk.Label(self.mainframe, text="Axis 4 Left Limit:")
-        self.Axis4LimitLeftLabel.grid(column=10, row=6, sticky=E)
+        self.Axis4LimitLeftLabel.grid(column=8, row=6, sticky=E)
 
         self.Axis4LimitRight = StringVar()
-        ttk.Entry(self.mainframe, textvariable=self.Axis4LimitRight).grid(column=11, row=7, sticky=(W))
+        ttk.Entry(self.mainframe, textvariable=self.Axis4LimitRight, width=15).grid(column=9, row=7, sticky=(W))
         self.Axis4LimitRightLabel = ttk.Label(self.mainframe, text="Axis 4 Right Limit:")
-        self.Axis4LimitRightLabel.grid(column=10, row=7, sticky=E)
+        self.Axis4LimitRightLabel.grid(column=8, row=7, sticky=E)
 
-        self.mainframe.rowconfigure(8, minsize=20) 
+#        self.mainframe.rowconfigure(8, minsize=20) 
 
         self.Waittime = StringVar(value = '0')
-        ttk.Entry(self.mainframe, textvariable=self.Waittime).grid(column=11, row=9, sticky=(W))
+        ttk.Entry(self.mainframe, textvariable=self.Waittime, width=15).grid(column=9, row=9, sticky=(W))
         self.WaittimeLabel = ttk.Label(self.mainframe, text="Wait time:")
-        self.WaittimeLabel.grid(column=10, row=9, sticky=E)
+        self.WaittimeLabel.grid(column=8, row=9, sticky=E)
 
         self.Radius = StringVar(value = '0')
-        ttk.Entry(self.mainframe, textvariable=self.Radius).grid(column=11, row=10, sticky=(W))
+        ttk.Entry(self.mainframe, textvariable=self.Radius, width=15).grid(column=9, row=10, sticky=(W))
         self.RadiusLabel = ttk.Label(self.mainframe, text="Radius:")
-        self.RadiusLabel.grid(column=10, row=10, sticky=E)
+        self.RadiusLabel.grid(column=8, row=10, sticky=E)
 
         self.Angle = StringVar(value = '0')
-        ttk.Entry(self.mainframe, textvariable=self.Angle).grid(column=11, row=11, sticky=(W))
+        ttk.Entry(self.mainframe, textvariable=self.Angle, width=15).grid(column=9, row=11, sticky=(W))
         self.AngleLabel = ttk.Label(self.mainframe, text="Angle:")
-        self.AngleLabel.grid(column=10, row=11, sticky=E)
+        self.AngleLabel.grid(column=8, row=11, sticky=E)
 
         self.ZPosition = StringVar(value = '0')
-        ttk.Entry(self.mainframe, textvariable=self.ZPosition).grid(column=11, row=12, sticky=(W))
+        ttk.Entry(self.mainframe, textvariable=self.ZPosition, width=15).grid(column=9, row=12, sticky=(W))
         self.ZPositionLabel = ttk.Label(self.mainframe, text="Z Position:")
-        self.ZPositionLabel.grid(column=10, row=12, sticky=E)
+        self.ZPositionLabel.grid(column=8, row=12, sticky=E)
 
         self.btnAutoMove  = ttk.Button(self.mainframe, text="Start Auto Movement",command=self.automove)
-        self.btnAutoMove.grid(row=13,column=10,columnspan=2, sticky=(N, W, E, S))
+        self.btnAutoMove.grid(row=13,column=8,columnspan=2, sticky=(N, W, E, S))
+        self.btnMovePosition  = ttk.Button(self.mainframe, text="Next Position",command=self.next_position)
+        self.btnMovePosition.grid(row=14,column=8,columnspan=2, sticky=(N, W, E, S))
+
+        self.mainframe.columnconfigure(10, minsize=10, weight = 0) 
 
         self.connectLaser = ttk.Button(self.mainframe, text="Connect to Laser",command=self.connectToLaser)
-        self.connectLaser.grid(row=1,column=8,columnspan=2,pady=20, sticky=(N, W, E, S))
+        self.connectLaser.grid(row=0,column=11,columnspan=2, sticky=(N, W, E, S))
 
         self.ldcurrent = StringVar(value = '0')
-        ttk.Entry(self.mainframe, textvariable=self.ldcurrent).grid(column=9, row=3, sticky=(W))
-        self.ldcurrentLabel = ttk.Label(self.mainframe, text="LD Current")
-        self.ldcurrentLabel.grid(column=8, row=3, sticky=E)
+        ttk.Entry(self.mainframe, textvariable=self.ldcurrent, width=15).grid(column=12, row=2, sticky=(W))
+        self.ldcurrentLabel = ttk.Label(self.mainframe, text="LD Current (mA)")
+        self.ldcurrentLabel.grid(column=11, row=2, sticky=E)
         self.btnldcurrent = ttk.Button(self.mainframe, text="Set LD Current",command=self.setLDCurrent)
-        self.btnldcurrent.grid(row=6,column=8,columnspan=2,pady=20, sticky=(N, W, E, S))
+        self.btnldcurrent.grid(row=3,column=11,columnspan=2, sticky=(N, W, E, S))
 
         self.trigrate = StringVar(value = '0')
-        ttk.Entry(self.mainframe, textvariable=self.trigrate).grid(column=9, row=4, sticky=(W))
-        self.trigRateLabel = ttk.Label(self.mainframe, text="Trigger Rate")
-        self.trigRateLabel.grid(column=8, row=4, sticky=E)
+        ttk.Entry(self.mainframe, textvariable=self.trigrate, width=15).grid(column=12, row=5, sticky=(W))
+        self.trigRateLabel = ttk.Label(self.mainframe, text="Trigger Rate (kHz)")
+        self.trigRateLabel.grid(column=11, row=5, sticky=E)
         self.btntrigrate = ttk.Button(self.mainframe, text="Set Trig Rate",command=self.setTriggerRate)
-        self.btntrigrate.grid(row=7,column=8,columnspan=2,pady=20, sticky=(N, W, E, S))
+        self.btntrigrate.grid(row=6,column=11,columnspan=2, sticky=(N, W, E, S))
 
         self.pulsewidth = StringVar(value = '0')
-        ttk.Entry(self.mainframe, textvariable=self.pulsewidth).grid(column=9, row=5, sticky=(W))
+        ttk.Entry(self.mainframe, textvariable=self.pulsewidth, width=15).grid(column=12, row=8, sticky=(W))
         self.pulseWidthLabel = ttk.Label(self.mainframe, text="Pulse Width (ps)")
-        self.pulseWidthLabel.grid(column=8, row=5, sticky=E)
+        self.pulseWidthLabel.grid(column=11, row=8, sticky=E)
         self.btnpulsewidth = ttk.Button(self.mainframe, text="Set Pulse Width",command=self.setPulseWidth)
-        self.btnpulsewidth.grid(row=8,column=8,columnspan=2,pady=20, sticky=(N, W, E, S))
+        self.btnpulsewidth.grid(row=9,column=11,columnspan=2, sticky=(N, W, E, S))
+
+        self.laserPDCurrent = StringVar(value = '0')
+        ttk.Entry(self.mainframe, textvariable=self.laserPDCurrent, width=15).grid(column=12, row=11, sticky=(W))
+        self.laserPDCurrentLabel = ttk.Label(self.mainframe, text="PD Current (mA)")
+        self.laserPDCurrentLabel.grid(column=11, row=11, sticky=E)
 
         self.btnldstatus = ttk.Button(self.mainframe, text="Switch LD ON", command=self.setLDStatus, style="LD.TButton")
-        self.btnldstatus.grid(row=10,column=8,columnspan=2,pady=20, sticky=(N, W, E, S))
+        self.btnldstatus.grid(row=13,column=11,columnspan=2, sticky=(N, W, E, S))
 
         self.btntecstatus = ttk.Button(self.mainframe, text="Switch TEC ON",command=self.setTECStatus, style="TEC.TButton")
-        self.btntecstatus.grid(row=11,column=8,columnspan=2,pady=20, sticky=(N, W, E, S))
+        self.btntecstatus.grid(row=14,column=11,columnspan=2, sticky=(N, W, E, S))
 
         self.btnexttrig = ttk.Button(self.mainframe, text="Switch EXT ON",command=self.setExtTrig, style="EXT.TButton")
-        self.btnexttrig.grid(row=12,column=8,columnspan=2,pady=20, sticky=(N, W, E, S))
+        self.btnexttrig.grid(row=15,column=11,columnspan=2, sticky=(N, W, E, S))
 
 
         self.mainframe.rowconfigure(16, weight=1)
-        self.mainframe.columnconfigure(9, weight=1)
+#        self.mainframe.columnconfigure(11, weight=1)
 
         y = [35.6, 23.0, 14.2, 7.0, 64.7, 50.0, 4.3, 1.1, 0.6, 2.5, 67.4]#, 70.0, 80.0, 90.0, 100.0]
         x = [46.4, 36.1, 27.25, 19.1, 75.4, 58.9, 15.7, 8.7, 3.25, 13.25, 78.4]
@@ -547,6 +557,12 @@ class CDS_Control():
 
             self.Axis4LimitLeft.set(str(left))
             self.Axis4LimitRight.set(str(right))
+
+        if(self.laser != -1):
+            self.laserPDCurrent.set(str(self.laser.GetPDCurrent()))
+            self.pulsewidth.set(str(self.laser.GetPulseWidth()))
+            self.trigrate.set(str(self.laser.GetTrigRate()))
+            self.ldcurrent.set(str(self.laser.GetLDCurrent()))
 
         self.root.after(500, app.UpdatePos)
 
@@ -872,6 +888,8 @@ class CDS_Control():
         return 0
 
     def automove(self):
+        self.move_event = threading.Event()
+        self.move_event.clear()
         hang = float(self.Waittime.get())
         rads = self.Radius.get().split(',')
         ang = self.Angle.get().split(',')
@@ -947,6 +965,42 @@ class CDS_Control():
             # Wait until move has completed
             self.root.after(5000, self.automove_wait, hang, eventPhi, eventR, eventZ, positions, index)
 
+    def next_position(self):
+        self.move_event.set()
+
+    def automove_wait(self, hang, eventPhi, eventR, eventZ, positions, index = 0):
+        #Move to position at index 0
+        print("Moving to position", positions[index])
+        self.automove_loop(eventPhi, eventR, eventZ, positions[index])
+        # If we are at the position we want to be
+        if eventPhi.is_set() and eventR.is_set() and eventZ.is_set():
+            print("Switch on laser here!")
+#            if self.laser != -1:
+#                self.setLDStatus()
+            if self.move_event.is_set():
+                print("Switch off laser here!")
+#                if self.laser != -1:
+#                    self.setLDStatus()
+                self.move_event.clear()
+                #Update index to move to next position and clear all events
+                index = index + 1
+                eventPhi.clear()
+                eventR.clear()
+                eventZ.clear()
+                # Check if we are at the end of the sequence
+                if index == len(positions):
+                    self.btnAutoMove["state"] = "enabled"
+                    print("Finished automove sequence!")
+                    return 0
+                else:
+                    self.root.after(50, self.automove_wait, hang, eventPhi, eventR, eventZ, positions, index)
+            else:
+                #Wait to collect data
+                self.root.after(1000, self.automove_wait, hang, eventPhi, eventR, eventZ, positions, index)
+        # Not at position, so check again in 5 seconds
+        else:
+            # Wait until move has completed
+            self.root.after(5000, self.automove_wait, hang, eventPhi, eventR, eventZ, positions, index)
 
     def automove_loop(self, eventPhi, eventR, eventZ, position):
         if not eventPhi.is_set() and self.motor1.get_stopped(2):
@@ -993,11 +1047,13 @@ class CDS_Control():
 
     def setLDStatus(self):
         onoff = 0
-        if self.btnldstatus.config('relief')[-1] == 'sunken':
-            self.style.configure("LD.TButton", foreground='white', background='green', relief="raised", text="Switch LD ON")
+        if self.style.lookup("LD.TButton", "background") == 'red':
+            self.style.configure("LD.TButton", foreground='white', background='green', text="Switch LD ON")
+            self.btnldstatus.config(text='Switch LD ON')
             onoff = 0
         else:
-            self.style.configure("LD.TButton", foreground='white', background='red', relief="sunken", text="Switch LD OFF")
+            self.style.configure("LD.TButton", foreground='white', background='red', text="Switch LD OFF")
+            self.btnldstatus.config(text='Switch LD OFF')
             onoff = 1
 
         self.laser.SetLDStatus(onoff)
@@ -1005,11 +1061,13 @@ class CDS_Control():
 
     def setTECStatus(self):
         onoff = 0
-        if self.btntecstatus.config('relief')[-1] == 'sunken':
-            self.style.configure("TEC.TButton", foreground='white', background='green', relief="raised", text="Switch TEC ON")
+        if self.style.lookup("TEC.TButton", "background") == 'red':
+            self.style.configure("TEC.TButton", foreground='white', background='green')
+            self.btntecstatus.config(text='Switch TEC ON')
             onoff = 0
         else:
-            self.style.configure("TEC.TButton", foreground='white', background='red', relief="sunken", text="Switch TEC OFF")
+            self.style.configure("TEC.TButton", foreground='white', background='red')
+            self.btntecstatus.config(text='Switch TEC OFF')
             onoff = 1
 
         self.laser.SetTECStatus(onoff)
@@ -1017,19 +1075,23 @@ class CDS_Control():
 
     def setExtTrig(self):
         onoff = 0
-        if self.btnexttrig.config('relief')[-1] == 'sunken':
-            self.style.configure("EXT.TButton", foreground='black', background='white', relief="raised", text="Switch EXT ON")
+        if self.style.lookup("EXT.TButton", "background") == 'blue':
+            self.style.configure("EXT.TButton", foreground='black', background='white')
+            self.btnexttrig.config(text='Switch EXT ON')
             onoff = 0
+            self.trig = -1
         else:
-            self.style.configure("EXT.TButton", foreground='white', background='blue', relief="sunken", text="Switch EXT OFF")
+            self.style.configure("EXT.TButton", foreground='white', background='blue')
+            self.btnexttrig.config(text='Switch EXT OFF')
             onoff = 1
+            self.trig = 0
 
         self.laser.SetTriggerOnOff(0,0,onoff)
         return 0
 
     def setTriggerRate(self):
         rate = float(self.trigrate.get())
-        if self.btnexttrig.config('relief')[-1] == 'sunken':
+        if self.style.lookup("EXT.TButton", "background") == 'blue':
             print("Set to use external trigger, doing nothing")
             return 1
         if (rate < 2) or (rate > 10000) :
@@ -1038,14 +1100,27 @@ class CDS_Control():
         elif rate < 50:
             self.laser.SetTriggerOnOff(0,1,0)
             self.laser.SetPG2Rate(rate)
+            self.trig = 2
             return 0
         else:
             self.laser.SetTriggerOnOff(1,0,0)
             self.laser.SetPG1Rate(rate)
+            self.trig = 1
             return 0
 
         return 0
 
+    def getTriggerRate(self):
+        if self.trig == 1:
+            return self.laser.GetPG1Rate()
+        elif self.trig == 2:
+            return self.laser.GetPG2Rate()
+        elif self.trig == -1:
+            return "No trigger"
+        else:
+            return "EXT"
+
+        return 0
 
     def __del__(self):
         self.stopall();
