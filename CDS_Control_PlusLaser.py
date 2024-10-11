@@ -31,7 +31,7 @@ class CDS_Control():
         self.move_event = -1
 
         self.laser = -1
-        self.trig = -1
+        self.trig = 1
 
         self.current_state = []
 
@@ -330,7 +330,7 @@ class CDS_Control():
 
         self.laserPDCurrent = StringVar(value = '0')
         ttk.Entry(self.mainframe, textvariable=self.laserPDCurrent, width=15).grid(column=12, row=11, sticky=(W))
-        self.laserPDCurrentLabel = ttk.Label(self.mainframe, text="PD Current (mA)")
+        self.laserPDCurrentLabel = ttk.Label(self.mainframe, text="PD Current (pA)")
         self.laserPDCurrentLabel.grid(column=11, row=11, sticky=E)
 
         self.btnldstatus = ttk.Button(self.mainframe, text="Switch LD ON", command=self.setLDStatus, style="LD.TButton")
@@ -1102,10 +1102,10 @@ class CDS_Control():
         if self.style.lookup("EXT.TButton", "background") == 'blue':
             print("Set to use external trigger, doing nothing")
             return 1
-        if (rate < 2) or (rate > 10000) :
-            print("Cannot reduce trigger rate below 2kHz or above 10MHz")
+        if (rate < 3) or (rate > 100000) :
+            print("Cannot reduce trigger rate below 3kHz or above 100MHz")
             return 1
-        elif rate < 50:
+        elif rate < 100.1:
             self.laser.SetTriggerOnOff(0,1,0)
             self.laser.SetPG2Rate(rate)
             self.trig = 2

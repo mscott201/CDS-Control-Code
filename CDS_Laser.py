@@ -350,12 +350,14 @@ class Laser:
         indat = bytearray(2)
         indat[0] = 14
         number = 0
+        print("PG1 = ", PG1, "PG2 = ", PG2, "EXT = ", EXT)
         if PG1:
-            number += 1
+            number = (int(number) | 1)
         if PG2:
-            number += 2
+            number = (int(number) | 2)
         if EXT:
-            number += 4
+            number = (int(number) | 4)
+        print(number)
         indat[1] = number
 
         values = self.LASER_COMMAND(indat);
@@ -365,7 +367,7 @@ class Laser:
  
     def SetPG1Rate(self, freq):
 
-        freq = int(freq*1000)
+        freq = int(freq)
 
         indat = bytearray(5)
         indat[0] = 15
@@ -395,7 +397,6 @@ class Laser:
         return result;
 
     def SetPG2Rate(self, freq):
-
         freq = int(freq*1000)
         print("PG2 Freq = ", freq)
         indat = bytearray(5)
@@ -445,13 +446,16 @@ class Laser:
 #laser.GetHardwareInfo()
 #
 #laser.SetTECStatus(0)
+#laser.SetLDStatus(0)
+#laser.SetTriggerOnOff(0,0,0)
 #
-##laser.SetPG1Rate(1000000)
 #print("PG1 rate =", laser.GetPG1Rate())
 #laser.SetTriggerOnOff(1,0,0)
+#laser.SetPG1Rate(200)
+#print("PG1 rate =", laser.GetPG1Rate())
 #
-#print("Pulse width =", laser.GetPulseWidth())
-#laser.SetPulseWidth(90)
+##print("Pulse width =", laser.GetPulseWidth())
+##laser.SetPulseWidth(90)
 #
 #print("BD Temp = ", laser.GetBDTemp())
 #print("LD Temp = ", laser.GetLDTemp())
@@ -462,13 +466,12 @@ class Laser:
 #
 #print("Bias = ", laser.GetBias())
 #
-#laser.SetTriggerOnOff(1,0,0)
+##laser.SetTriggerOnOff(1,0,0)
 #
 #
-#laser.SetLDCurrent(185.01)
-#print("New LD Current = ", laser.GetLDCurrent())
-#
-#
-#laser.SetLDStatus(0)
-#
-#
+##laser.SetLDCurrent(185.01)
+##print("New LD Current = ", laser.GetLDCurrent())
+
+
+
+
