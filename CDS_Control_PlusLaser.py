@@ -199,10 +199,10 @@ class CDS_Control():
                 ax[index].set_ylim(-10, 200)
                 ax[index].set_ylabel("Lower Feed Position / cm")
             elif(index == 2):
-                ax[index].set_ylim(-180, 180)
+                ax[index].set_ylim(-10, 300)
                 ax[index].set_ylabel("Arm Angle / degrees")
             elif(index == 3):
-                ax[index].set_ylim(-10, 200)
+                ax[index].set_ylim(-10, 130)
                 ax[index].set_ylabel("Radius / cm")
             else:
                 ax[index].set_ylim(-10,1000)
@@ -831,11 +831,17 @@ class CDS_Control():
     def moveRadius(self, r, eventR, eventZ):
         print("Moving to radius", r)
         realR = r
+        if abs(r - self.radius) < 1:
+            eventR.set()
+            eventZ.clear()
+            print("Currently at position, therefore don't move")
+            return 0
+
         if r > self.radius:
             realR += 1.0
 
         self.radius = r
-        realR += 8.3 # Add distance from limit switch to wheel on car
+        realR += 8.3 - 0.5 # Add distance from limit switch to wheel on car, plus initial backlash + initial offset in construction
 
         if realR > 120:
             print("Moving off end of arm")
@@ -852,7 +858,7 @@ class CDS_Control():
 #            height = interpolate.splev(r, self.rspline, der=0)
 
         # New calc, final day at IC
-        height = 55.5 + 0.686*r + 1.89e-3*r*r
+        height = 55.5 + 0.686*r + 1.89e-3*r*r # (55.5)
 
 
         # Get zero height for current position
@@ -919,11 +925,12 @@ class CDS_Control():
             positions.append([phi,110,60])
             positions.append([phi,110,0])
             for r in rads:
+                if r > 110:
+                    r = 110
                 for i in range(len(zpos)):
                     pos = [phi, r, zpos[i]]
                     positions.append(pos)
                     if i == (len(zpos)-1):
-                        print("HELLO")
                         pos2 = [phi, r, 0]
                         positions.append(pos2)
 
@@ -1102,7 +1109,12 @@ class CDS_Control():
         if self.style.lookup("EXT.TButton", "background") == 'blue':
             print("Set to use external trigger, doing nothing")
             return 1
-        if (rate < 3) or (rate > 100000) :
+
+        if rate < 1 :
+            self.laser.SetTriggerOnOff(0,0,0)
+            self.trig = -1
+            return 0
+        elif (rate < 3) or (rate > 100000) :
             print("Cannot reduce trigger rate below 3kHz or above 100MHz")
             return 1
         elif rate < 100.1:
