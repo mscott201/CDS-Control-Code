@@ -858,7 +858,7 @@ class CDS_Control():
 #            height = interpolate.splev(r, self.rspline, der=0)
 
         # New calc, final day at IC
-        height = 55.5 + 0.686*r + 1.89e-3*r*r # (55.5)
+        height = 161.5 + 0.686*r + 1.89e-3*r*r # (55.5)
 
 
         # Get zero height for current position
@@ -925,7 +925,7 @@ class CDS_Control():
             positions.append([phi,110,60])
             positions.append([phi,110,0])
             for r in rads:
-                if r > 110:
+                if int(r) > 110:
                     r = 110
                 for i in range(len(zpos)):
                     pos = [phi, r, zpos[i]]
