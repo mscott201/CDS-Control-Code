@@ -858,7 +858,7 @@ class CDS_Control():
 #            height = interpolate.splev(r, self.rspline, der=0)
 
         # New calc, final day at IC
-        height = 161.5 + 0.686*r + 1.89e-3*r*r # (55.5)
+        height = 174 + 0.686*r + 1.89e-3*r*r # (55.5)
 
 
         # Get zero height for current position
@@ -919,11 +919,12 @@ class CDS_Control():
 
         positions = []
         for phi in ang:
-            positions.append([phi,0,0])
-            positions.append([phi,55,0])
-            positions.append([phi,110,0])
-            positions.append([phi,110,60])
-            positions.append([phi,110,0])
+            if len(rads) > 1 or rads[0] > 0:
+                positions.append([phi,0,0])
+                positions.append([phi,55,0])
+                positions.append([phi,110,0])
+                positions.append([phi,110,60])
+                positions.append([phi,110,0])
             for r in rads:
                 if int(r) > 110:
                     r = 110
@@ -953,31 +954,31 @@ class CDS_Control():
 
         return 0
 
-    def automove_wait(self, hang, eventPhi, eventR, eventZ, positions, index = 0):
-        #Move to position at index 0
-        print("Moving to position", positions[index])
-        self.automove_loop(eventPhi, eventR, eventZ, positions[index])
-        # If we are at the position we want to be
-        if eventPhi.is_set() and eventR.is_set() and eventZ.is_set():
-            print("Switch on laser here!")
-            time.sleep(hang)
-            print("Switch off laser here!")
-            #Update index to move to next position and clear all events
-            index = index + 1
-            eventPhi.clear()
-            eventR.clear()
-            eventZ.clear()
-            # Check if we are at the end of the sequence
-            if index == len(positions):
-                self.btnAutoMove["state"] = "enabled"
-                print("Finished automove sequence!")
-                return 0
-            else:
-                self.root.after(50, self.automove_wait, hang, eventPhi, eventR, eventZ, positions, index)
-        # Not at position, so check again in 5 seconds
-        else:
-            # Wait until move has completed
-            self.root.after(5000, self.automove_wait, hang, eventPhi, eventR, eventZ, positions, index)
+#    def automove_wait(self, hang, eventPhi, eventR, eventZ, positions, index = 0):
+#        #Move to position at index 0
+#        print("Moving to position", positions[index])
+#        self.automove_loop(eventPhi, eventR, eventZ, positions[index])
+#        # If we are at the position we want to be
+#        if eventPhi.is_set() and eventR.is_set() and eventZ.is_set():
+#            print("Switch on laser here!")
+#            time.sleep(hang)
+#            print("Switch off laser here!")
+#            #Update index to move to next position and clear all events
+#            index = index + 1
+#            eventPhi.clear()
+#            eventR.clear()
+#            eventZ.clear()
+#            # Check if we are at the end of the sequence
+#            if index == len(positions):
+#                self.btnAutoMove["state"] = "enabled"
+#                print("Finished automove sequence!")
+#                return 0
+#            else:
+#                self.root.after(50, self.automove_wait, hang, eventPhi, eventR, eventZ, positions, index)
+#        # Not at position, so check again in 5 seconds
+#        else:
+#            # Wait until move has completed
+#            self.root.after(5000, self.automove_wait, hang, eventPhi, eventR, eventZ, positions, index)
 
     def next_position(self):
         self.move_event.set()
