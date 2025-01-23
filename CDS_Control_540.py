@@ -1,6 +1,6 @@
 #IMPORTS######################################################################
 import threading
-from CDS_Motor_PlusStrain import Motor
+from CDS_Motor_540 import Motor
 from CDS_Laser import Laser
 from tkinter import *
 from tkinter import ttk
@@ -81,11 +81,9 @@ class CDS_Control():
         self.btnSerClo1 = ttk.Button(self.mainframe, text="Close Controller 1 Serial Port",command=self.closeSerial1)
         self.btnSerClo1.grid(row=1,column=2,columnspan=2,pady=20, sticky=(N, W, E, S))
 
-#        self.mainframe.rowconfigure(2, minsize=30)
-
         btnMotor1 = ttk.Button(self.mainframe, text="Initialise Axis 1",command=self.InitialiseAxis1).grid(row=3,column=0,columnspan=2, sticky=(N, W, E, S))
 
-        self.btnHome1 = ttk.Button(self.mainframe, text="Axis 1 Return to Home",command=partial(self.home, 1))
+        self.btnHome1 = ttk.Button(self.mainframe, text="Axis 1 Set Current Position as Home",command=partial(self.home, 1))
         self.btnHome1.grid(row=4,column=0,columnspan=2, sticky=(N, W, E, S))
 
         self.PosEnc1 = StringVar()
@@ -270,7 +268,7 @@ class CDS_Control():
             print("Cannot initialise axis without opening serial port")
             return 1
 
-        self.motor1.INIT_AXIS(self.ser1, port, axis, 'Z')
+        self.motor1.INIT_AXIS(self.ser1, port, axis, 'PHI')
         self.hasMotor1Axis1 = 1
         return 0
 
